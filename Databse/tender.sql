@@ -66,6 +66,17 @@ CREATE TABLE saved_tenders (
     UNIQUE KEY unique_user_tender (user_id, tender_id)
 );
 
+-- Create user_preferences table  
+CREATE TABLE IF NOT EXISTS user_preferences (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    preferred_departments JSON,
+    notification_settings JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_pref (user_id),
+    INDEX idx_user_id (user_id)
+);
 
 
 -- NOTIFICATIONS (record of who was notified about which tender)

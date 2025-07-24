@@ -18,14 +18,28 @@ if ($isLoggedIn) {
     // $stmt->execute([$userId]);
     // $subscription = $stmt->fetch();
     
-    // Mock data for demonstration
-    $currentPlan = 'basic'; // none, basic, premium, enterprise
+    $currentPlan = 'trial'; // renamed for clarity
     $subscriptionStatus = 'active';
-    $subscriptionExpiry = '2025-08-16';
+    $subscriptionStart = strtotime("-6 days"); // mock: trial started 6 days ago
+    $subscriptionExpiry = date('Y-m-d', strtotime("+1 day", $subscriptionStart)); // 7 days total
 }
 
 // Subscription plans data
 $plans = [
+    'trial' => [
+        'name' => '7-Day Free Trial',
+        'price' => 0,
+        'period' => '7 days',
+        'features' => [
+            'Up to 10 tender alerts',
+            'Basic search functionality',
+            'Email notifications',
+            'Save up to 5 tenders',
+            'Community support'
+        ],
+        'color' => '#6C757D',
+        'recommended' => false
+    ],
     'basic' => [
         'name' => 'Basic Plan',
         'price' => 299,
@@ -84,11 +98,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
     if ($action === 'subscribe' && isset($plans[$planId])) {
         // Process subscription (integrate with payment gateway)
         // For demo purposes, we'll just show success message
-        $subscriptionMessage = "Subscription to {$plans[$planId]['name']} initiated successfully!";
+        if ($planId === 'free') {
+            $subscriptionMessage = "Welcome to TenderAlert! You're now on the Free plan.";
+        } else {
+            $subscriptionMessage = "Subscription to {$plans[$planId]['name']} initiated successfully!";
+        }
         $messageType = 'success';
     } elseif ($action === 'cancel') {
-        // Cancel subscription
-        $subscriptionMessage = "Subscription cancelled successfully.";
+        // Cancel subscription (downgrade to free)
+        $subscriptionMessage = "Subscription cancelled. You've been moved to the Free plan.";
         $messageType = 'success';
     } elseif ($action === 'upgrade') {
         // Upgrade subscription
@@ -102,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Choose the perfect subscription plan for your tender monitoring needs. Get real-time alerts, advanced filters, and premium support.">
+    <meta name="description" content="Choose the perfect subscription plan for your tender monitoring needs. Start free or upgrade for premium features.">
     <title>Subscription Plans | TenderAlert</title>
     <!-- Open Graph tags -->
     <meta property="og:title" content="Subscription Plans | TenderAlert">
@@ -123,22 +141,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             font-size: 42px;
         }
 
-        .plans-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .plan-card {
-            background: white;
-            border-radius: 15px;
-            padding: 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
+.plans-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 2rem;  
+    padding-bottom: 1rem;
+}
+.plan-card {
+    flex: 0 0 300px;
+}
 
         .plan-card:hover {
             transform: translateY(-10px);
@@ -171,6 +182,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             position: relative;
         }
 
+        .plan-header.free {
+            background: linear-gradient(135deg, #6C757D, #5a6268);
+        }
+
         .plan-header.basic {
             background: linear-gradient(135deg, #25559D, #1c4279);
         }
@@ -193,6 +208,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             font-size: 3rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
+        }
+
+        .plan-price.free {
+            font-size: 2.5rem;
         }
 
         .plan-period {
@@ -239,6 +258,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             letter-spacing: 0.5px;
         }
 
+        .plan-button.free {
+            background: #5a6268;
+            color: white;
+        }
+
         .plan-button.basic {
             background: #25559D;
             color: white;
@@ -271,6 +295,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             border-radius: 15px;
             padding: 2rem;
             margin-bottom: 2rem;
+        }
+
+        .current-subscription.free {
+            background: linear-gradient(135deg, #6C757D, #5a6268);
         }
 
         .current-subscription h3 {
@@ -366,6 +394,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             font-size: 1.2rem;
         }
 
+        .free-trial-banner {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .free-trial-banner h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.3rem;
+        }
+
+        .free-trial-banner p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
         @media (max-width: 768px) {
             .plans-grid {
                 grid-template-columns: 1fr;
@@ -396,7 +443,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             <nav class="centered-nav">
                 <a href="index.php"><i class="fas fa-home"></i> Home</a>
                 <?php if ($isLoggedIn): ?>
-                <a href="saved.php"><i class="fas fa-bookmark"></i> Saved Tenders</a>
+                <a href="saved_tender.php"><i class="fas fa-bookmark"></i> Saved Tenders</a>
                 <?php endif; ?>
                 <a href="subscriptions.php" class="active"><i class="fas fa-credit-card"></i> Subscriptions</a>
                 <?php if ($isLoggedIn): ?>
@@ -408,7 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
         </div>
         <div class="header-text">
             <h1>Choose Your Plan</h1>
-            <p>Unlock premium features and stay ahead of the competition with our subscription plans.</p>
+            <p>Start free and upgrade anytime. Unlock premium features and stay ahead of the competition.</p>
         </div>
     </header>
 
@@ -419,9 +466,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             </div>
         <?php endif; ?>
 
+        <?php if (!$isLoggedIn): ?>
+            <div class="free-trial-banner">
+            <h3><i class="fas fa-gift"></i> Start Your 7-Day Free Trial</h3>
+                <p>No credit card required. Get instant access to tender alerts and upgrade anytime.</p>
+            </div>
+        <?php endif; ?>
+
         <?php if ($isLoggedIn && $currentPlan): ?>
-            <div class="current-subscription">
-                <h3><i class="fas fa-crown"></i> Current Subscription</h3>
+            <div class="current-subscription <?= $currentPlan ?>">
+                <h3>
+                    <i class="fas fa-<?= $currentPlan === 'free' ? 'user' : 'crown' ?>"></i> 
+                    Current Subscription
+                </h3>
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h4><?= htmlspecialchars($plans[$currentPlan]['name']) ?></h4>
@@ -449,8 +506,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                 <div class="plan-card <?= $plan['recommended'] ? 'recommended' : '' ?>">
                     <div class="plan-header <?= $planId ?>">
                         <div class="plan-name"><?= htmlspecialchars($plan['name']) ?></div>
-                        <div class="plan-price">R<?= number_format($plan['price']) ?></div>
-                        <div class="plan-period">per <?= htmlspecialchars($plan['period']) ?></div>
+                        <div class="plan-price <?= $planId ?>">
+                            <?php if ($planId === 'free'): ?>
+                                FREE
+                            <?php else: ?>
+                                R<?= number_format($plan['price']) ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="plan-period">
+                            <?php if ($planId === 'free'): ?>
+                                <?= htmlspecialchars($plan['period']) ?>
+                            <?php else: ?>
+                                per <?= htmlspecialchars($plan['period']) ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <div class="plan-body">
                         <ul class="plan-features">
@@ -471,13 +540,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                                     <input type="hidden" name="action" value="subscribe">
                                     <input type="hidden" name="plan" value="<?= $planId ?>">
                                     <button type="submit" class="plan-button <?= $planId ?>">
-                                        <i class="fas fa-credit-card"></i> Subscribe Now
+                                        <?php if ($planId === 'free'): ?>
+                                            <i class="fas fa-user"></i> Get Started Free
+                                        <?php else: ?>
+                                            <i class="fas fa-credit-card"></i> Subscribe Now
+                                        <?php endif; ?>
                                     </button>
                                 </form>
                             <?php endif; ?>
                         <?php else: ?>
                             <button class="plan-button <?= $planId ?>" onclick="window.location.href='login.php'">
-                                <i class="fas fa-sign-in-alt"></i> Sign In to Subscribe
+                                <i class="fas fa-sign-in-alt"></i> Sign In to Get Started
                             </button>
                         <?php endif; ?>
                     </div>
@@ -493,6 +566,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                 <thead>
                     <tr>
                         <th>Feature</th>
+                        <th>Free</th>
                         <th>Basic</th>
                         <th>Premium</th>
                         <th>Enterprise</th>
@@ -501,12 +575,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                 <tbody>
                     <tr>
                         <td class="feature-name">Tender Alerts</td>
+                        <td>5/month</td>
                         <td>50/month</td>
                         <td>Unlimited</td>
                         <td>Unlimited</td>
                     </tr>
                     <tr>
+                        <td class="feature-name">Saved Tenders</td>
+                        <td>3 tenders</td>
+                        <td>20 tenders</td>
+                        <td>Unlimited</td>
+                        <td>Unlimited</td>
+                    </tr>
+                    <tr>
                         <td class="feature-name">Advanced Search</td>
+                        <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-check check"></i></td>
                         <td><i class="fas fa-check check"></i></td>
@@ -514,11 +597,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                     <tr>
                         <td class="feature-name">Real-time Notifications</td>
                         <td><i class="fas fa-times cross"></i></td>
+                        <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-check check"></i></td>
                         <td><i class="fas fa-check check"></i></td>
                     </tr>
                     <tr>
                         <td class="feature-name">Export to PDF/Excel</td>
+                        <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-check check"></i></td>
                         <td><i class="fas fa-check check"></i></td>
@@ -527,16 +612,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                         <td class="feature-name">Multi-user Access</td>
                         <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-times cross"></i></td>
+                        <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-check check"></i></td>
                     </tr>
                     <tr>
                         <td class="feature-name">API Access</td>
                         <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-times cross"></i></td>
+                        <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-check check"></i></td>
                     </tr>
                     <tr>
                         <td class="feature-name">Dedicated Support</td>
+                        <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-times cross"></i></td>
                         <td><i class="fas fa-check check"></i></td>
@@ -552,11 +640,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             
             <div class="faq-item">
                 <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Is the free plan really free?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Yes! The free plan is completely free with no hidden costs. You get 5 tender alerts per month, can save 3 tenders, and have access to our basic features forever.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
                     <span>How do I cancel my subscription?</span>
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    You can cancel your subscription at any time from your account settings. Your subscription will remain active until the end of your current billing period.
+                    You can cancel your subscription at any time from your account settings. Your subscription will remain active until the end of your current billing period, after which you'll be moved to the free plan.
                 </div>
             </div>
 
@@ -586,7 +684,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    Yes, we offer a 7-day free trial for all premium plans. No credit card required to start your trial.
+                    Our free plan serves as a permanent trial! You can use it forever, and if you need more features, you can upgrade to any paid plan at any time.
                 </div>
             </div>
 
@@ -596,7 +694,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    We offer a 30-day money-back guarantee. If you're not satisfied with our service, contact us within 30 days for a full refund.
+                    We offer a 30-day money-back guarantee on all paid plans. If you're not satisfied with our service, contact us within 30 days for a full refund.
                 </div>
             </div>
         </div>
@@ -613,10 +711,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
             </div>
             <div class="modal-body">
                 <p>Choose a plan to upgrade to:</p>
-                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
                     <?php foreach ($plans as $planId => $plan): ?>
-                        <?php if ($planId !== $currentPlan): ?>
-                            <form method="POST" style="flex: 1;">
+                        <?php if ($planId !== $currentPlan && $planId !== 'free'): ?>
+                            <form method="POST" style="flex: 1; min-width: 200px;">
                                 <input type="hidden" name="action" value="upgrade">
                                 <input type="hidden" name="plan" value="<?= $planId ?>">
                                 <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -644,15 +742,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
                     <button class="btn btn-primary" onclick="window.location.href='account.php'">
                         <i class="fas fa-user"></i> Account Settings
                     </button>
-                    <button class="btn btn-secondary" onclick="window.location.href='billing.php'">
-                        <i class="fas fa-receipt"></i> Billing History
-                    </button>
-                    <form method="POST" style="display: inline;">
-                        <input type="hidden" name="action" value="cancel">
-                        <button type="submit" class="btn" style="background: #dc3545; color: white;" onclick="return confirm('Are you sure you want to cancel your subscription?')">
-                            <i class="fas fa-times"></i> Cancel Subscription
+                    <?php if ($currentPlan !== 'free'): ?>
+                        <button class="btn btn-secondary" onclick="window.location.href='billing.php'">
+                            <i class="fas fa-receipt"></i> Billing History
                         </button>
-                    </form>
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="action" value="cancel">
+                            <button type="submit" class="btn" style="background: #dc3545; color: white;" onclick="return confirm('Are you sure you want to cancel your subscription? You will be moved to the free plan.')">
+                                <i class="fas fa-times"></i> Cancel Subscription
+                            </button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -692,50 +792,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isLoggedIn) {
         }
 
         // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+}
+
+// Notification auto-hide
+document.addEventListener('DOMContentLoaded', function() {
+    const notifications = document.querySelectorAll('.notification');
+    
+    notifications.forEach(notification => {
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateY(-20px)';
+            
+            // Remove from DOM after animation
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
                 }
+            }, 300);
+        }, 5000);
+        
+        // Add close button functionality
+        const closeBtn = notification.querySelector('.close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
             });
         }
+    });
+});
 
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                const modals = document.querySelectorAll('.modal');
-                modals.forEach(modal => {
-                    if (modal.style.display === 'block') {
-                        modal.style.display = 'none';
-                        document.body.style.overflow = 'auto';
-                    }
-                });
+// Additional modal utilities
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (modal.style.display === 'block') {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
         });
+    }
+});
 
-        // Auto-hide notifications
-        document.addEventListener('DOMContentLoaded', function() {
-            const notification = document.querySelector('.notification.show');
-            if (notification) {
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 5000);
+// Show notification function
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <span class="notification-message">${message}</span>
+        <button class="close-btn">&times;</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Trigger animation
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateY(0)';
+    }, 100);
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
             }
-        });
+        }, 300);
+    }, 5000);
+    
+    // Add close button functionality
+    const closeBtn = notification.querySelector('.close-btn');
+    closeBtn.addEventListener('click', function() {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    });
+}
+</script>
 
-        // Smooth scrolling for internal links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-    </script>
-
-    <?php include 'footer.php'; ?>
 </body>
 </html>
