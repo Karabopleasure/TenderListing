@@ -249,7 +249,7 @@ $canSaveMore = count($savedTenders) < $maxSavedTenders[$userPlan];
 
         .tender-number {
             font-size: 0.9rem;
-            color: #666;
+            color: #ffffff;
             font-weight: 500;
         }
 
@@ -332,8 +332,8 @@ $canSaveMore = count($savedTenders) < $maxSavedTenders[$userPlan];
 
         .status-badge {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 5rem;
+            right: 2rem;
             padding: 0.3rem 0.8rem;
             border-radius: 20px;
             font-size: 0.8rem;
@@ -613,6 +613,277 @@ $canSaveMore = count($savedTenders) < $maxSavedTenders[$userPlan];
                 width: 35%;
             }
         }
+
+        .demo-container {
+            display: none; /* Hidden by default */
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        margin: 20px auto;
+        }
+
+        .demo-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(238, 90, 82, 0.3);
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(238, 90, 82, 0.4);
+        }
+
+        /* Confirmation Modal Overlay */
+        .confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .confirmation-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: slideIn 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.8) translateY(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .confirmation-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a52, #ff9ff3, #f368e0);
+            background-size: 300% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .tender-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #ff6b6b;
+            text-align: left;
+        }
+
+        .tender-info strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            box-shadow: 0 5px 15px rgba(238, 90, 82, 0.3);
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(238, 90, 82, 0.4);
+        }
+
+        .confirm-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cancel-btn {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .cancel-btn:hover {
+            background: #e9ecef;
+            color: #495057;
+            transform: translateY(-1px);
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            max-width: 400px;
+            padding: 20px 25px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #00b894, #00a085);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e17055, #d63031);
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .confirmation-modal {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+            
+            .notification {
+                top: 20px;
+                right: 20px;
+                left: 20px;
+                max-width: none;
+                transform: translateY(-100%);
+            }
+            
+            .notification.show {
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -620,7 +891,7 @@ $canSaveMore = count($savedTenders) < $maxSavedTenders[$userPlan];
         <div class="top-nav">
             <nav class="centered-nav">
                 <a href="index.php"><i class="fas fa-home"></i> Home</a>
-                <a href="saved_tender.php" class="active"><i class="fas fa-bookmark"></i> Saved Tenders</a>
+                <a href="#" class="active"><i class="fas fa-bookmark"></i> Saved Tenders</a>
                 <a href="subscriptions.php"><i class="fas fa-credit-card"></i> Subscriptions</a>
                 <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
@@ -680,14 +951,14 @@ $canSaveMore = count($savedTenders) < $maxSavedTenders[$userPlan];
                 <button class="filter-btn" data-filter="expired">Expired</button>
             </div>
 
-            <div class="export-buttons">
+            <!-- <div class="export-buttons">
                 <button class="export-btn excel" onclick="exportTableToExcel()">
                     <i class="fas fa-file-excel"></i> Excel
                 </button>
                 <button class="export-btn pdf" onclick="printTable()">
                     <i class="fas fa-file-pdf"></i> PDF
                 </button>
-            </div>
+            </div> -->
         </div>
 
         <!-- Tenders Grid -->
@@ -730,7 +1001,7 @@ $canSaveMore = count($savedTenders) < $maxSavedTenders[$userPlan];
                     <div class="tender-header">
                         <div>
                             <h3 class="tender-title"><?= htmlspecialchars($tender['tender_No']) ?></h3>
-                            <div class="tender-number">Saved on <?= date('d M Y', strtotime($tender['saved_at'])) ?></div>
+                            <div class="tender-number" >Saved on <?= date('d M Y', strtotime($tender['saved_at'])) ?></div>
                         </div>
                         <div class="tender-actions">
                             <button class="action-btn view" onclick='viewTender(this)' data-tender='<?= htmlspecialchars(json_encode($tender), ENT_QUOTES, "UTF-8") ?>' title="View Details">
@@ -789,6 +1060,38 @@ $canSaveMore = count($savedTenders) < $maxSavedTenders[$userPlan];
             </div>
             <div class="modal-body" id="modalContent">
                 <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-container" id="demoSection">
+    <h2 style="margin-bottom: 20px; color: #2c3e50;">Demo: Tender Removal</h2>
+    <p style="margin-bottom: 30px; color: #7f8c8d;">Click the button below to see the confirmation popup in action:</p>
+    <button class="demo-btn" onclick="showRemoveConfirmation('tender123', 'Government IT Infrastructure Upgrade Project - Phase 2')">
+        <i class="fas fa-trash-alt"></i> Remove Tender
+    </button>
+</div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationOverlay" class="confirmation-overlay">
+        <div class="confirmation-modal">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="modal-title">Confirm Removal</h3>
+            <p class="modal-message">Are you sure you want to remove this tender from your saved list? This action cannot be undone.</p>
+            
+            <div id="tenderInfo" class="tender-info">
+                <!-- Tender info will be populated here -->
+            </div>
+            
+            <div class="modal-actions">
+                <button id="confirmRemoveBtn" class="modal-btn confirm-btn">
+                    <i class="fas fa-trash-alt"></i> Yes, Remove
+                </button>
+                <button class="modal-btn cancel-btn" onclick="hideRemoveConfirmation()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
             </div>
         </div>
     </div>
@@ -898,6 +1201,149 @@ function closeModal() {
     document.getElementById("modal").style.display = "none";
     document.querySelector(".container").style.display = "block";
 }
+
+function unbookmarkTender(id) {
+        if (confirm("Are you sure you want to remove this tender?")) {
+            fetch("remove_saved_tender.php?id=" + id)
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(err => alert("Error removing tender."));
+        }
+    }
+
+    let currentTenderId = null;
+        let currentTenderTitle = null;
+
+        function showRemoveConfirmation(tenderId, tenderTitle) {
+    currentTenderId = tenderId;
+    currentTenderTitle = tenderTitle;
+
+    // Update the tender info in the modal
+    document.getElementById('tenderInfo').innerHTML = `
+        <strong>Tender:</strong><br>
+        ${tenderTitle}
+    `;
+
+    // Update the confirm button click handler
+    const confirmBtn = document.getElementById('confirmRemoveBtn');
+    confirmBtn.onclick = () => confirmRemoveTender();
+
+    // Show the modal
+    document.getElementById('confirmationOverlay').style.display = 'flex';
+
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+
+    // Show the demo section only when delete button is clicked
+    document.getElementById('demoSection').style.display = 'block';
+}
+
+function hideRemoveConfirmation() {
+    document.getElementById('confirmationOverlay').style.display = 'none';
+    document.body.style.overflow = 'auto';
+
+    // Optionally hide the demo section when modal is closed/cancelled
+    document.getElementById('demoSection').style.display = 'none';
+
+    currentTenderId = null;
+    currentTenderTitle = null;
+}
+
+// No other change needed unless you want to hide demo on successful removal
+function confirmRemoveTender() {
+    if (!currentTenderId) {
+        showNotification('Error: No tender selected', 'error');
+        return;
+    }
+
+    // Add loading state
+    const confirmBtn = document.getElementById('confirmRemoveBtn');
+    const originalText = confirmBtn.innerHTML;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner spinner"></i> Removing...';
+    confirmBtn.disabled = true;
+
+    // Simulate API call (replace with actual API)
+    setTimeout(() => {
+        confirmBtn.innerHTML = originalText;
+        confirmBtn.disabled = false;
+
+        // Simulate success
+        const success = true; // or your actual API response
+
+        if (success) {
+            showNotification('Tender removed successfully!', 'success');
+
+            // Optionally hide the demo section after removal
+            document.getElementById('demoSection').style.display = 'none';
+
+            // Close modal
+            hideRemoveConfirmation();
+
+            // Remove the tender card from DOM (if desired)
+            // document.querySelector(`[data-tender='${currentTenderId}']`).remove();
+
+        } else {
+            showNotification('Failed to remove tender. Please try again.', 'error');
+        }
+    }, 2000);
+}
+            
+        function showNotification(message, type = 'success') {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            
+            notification.innerHTML = `
+                <i class="fas ${icon} notification-icon"></i>
+                <span>${message}</span>
+                <button class="notification-close" onclick="this.parentNode.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Show notification with animation
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 400);
+                }
+            }, 5000);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('confirmationOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideRemoveConfirmation();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideRemoveConfirmation();
+            }
+        });
+
 </script>
 <?php
 include 'footer.php';
